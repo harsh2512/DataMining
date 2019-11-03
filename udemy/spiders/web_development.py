@@ -16,8 +16,12 @@ class WebDevelopmentSpider(scrapy.Spider):
     def parse(self, response):
         courses = response.xpath("//div[@class='curriculum-course-card--container--1ZgwU']")
         for course in courses:
-            course_link = response.urljoin(course.xpath(".//a/@href").get())
+            course_link = course.xpath(".//a/@href").get()
 
             yield {
                 'Course_Link' : course_link
             }
+        
+        next_page = response.xpath("//ul[@class='pagination pagination-expanded']/li[position()=last()]/a/@href").get()
+        if next_page:
+            yield scrapy.Request(url=next_page, callback=self.parse)
